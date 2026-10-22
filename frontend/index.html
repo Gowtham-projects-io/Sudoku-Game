@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sudoku — Premium Edition</title>
+  <meta name="description" content="A stunning, fully-featured Sudoku game powered by a Java OOP backend with REST API. Play Easy, Medium, or Hard puzzles with hints, undo, and a real-time timer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text y='70' x='50' font-size='60' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>9</text></svg>" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ─── Background orbs ──────────────────────────────────────────────────── -->
+  <div class="bg-orb orb-1" aria-hidden="true"></div>
+  <div class="bg-orb orb-2" aria-hidden="true"></div>
+  <div class="bg-orb orb-3" aria-hidden="true"></div>
+
+  <!-- ─── Main wrapper ─────────────────────────────────────────────────────── -->
+  <div class="app-wrapper">
+
+    <!-- ─── Header ─────────────────────────────────────────────────────────── -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <span class="logo-icon">⬛</span>
+          <span class="logo-text">Sudoku<span class="logo-accent">.</span></span>
+        </div>
+        <div class="difficulty-pills" id="difficultyPills" role="group" aria-label="Difficulty selector">
+          <button class="pill" id="pill-easy"   data-diff="easy"   onclick="selectDifficulty('easy')">Easy</button>
+          <button class="pill active" id="pill-medium" data-diff="medium" onclick="selectDifficulty('medium')">Medium</button>
+          <button class="pill" id="pill-hard"   data-diff="hard"   onclick="selectDifficulty('hard')">Hard</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="stat-chip" id="timerChip" aria-live="polite" aria-label="Timer">
+          <span class="stat-icon">⏱</span>
+          <span id="timer">00:00</span>
+        </div>
+        <div class="stat-chip" id="mistakesChip" aria-label="Mistake counter">
+          <span class="stat-icon">✗</span>
+          <span id="mistakeCount">0</span><span class="stat-label">&nbsp;/ 5</span>
+        </div>
+        <button class="btn btn-primary" id="newGameBtn" onclick="startNewGame()">New Game</button>
+      </div>
+    </header>
+
+    <!-- ─── Main content ────────────────────────────────────────────────────── -->
+    <main class="main-content">
+
+      <!-- ─── Board area ────────────────────────────────────────────────────── -->
+      <section class="board-section" aria-label="Sudoku board">
+        <div class="board-container">
+          <div class="board-glow" aria-hidden="true"></div>
+          <div id="sudokuBoard" class="sudoku-board" role="grid" aria-label="Sudoku grid" tabindex="0"></div>
+        </div>
+
+        <!-- ─── Number pad ──────────────────────────────────────────────────── -->
+        <div class="numpad" id="numpad" role="group" aria-label="Number input pad">
+          <button class="num-btn" data-num="1" onclick="inputNumber(1)" aria-label="Input 1">1</button>
+          <button class="num-btn" data-num="2" onclick="inputNumber(2)" aria-label="Input 2">2</button>
+          <button class="num-btn" data-num="3" onclick="inputNumber(3)" aria-label="Input 3">3</button>
+          <button class="num-btn" data-num="4" onclick="inputNumber(4)" aria-label="Input 4">4</button>
+          <button class="num-btn" data-num="5" onclick="inputNumber(5)" aria-label="Input 5">5</button>
+          <button class="num-btn" data-num="6" onclick="inputNumber(6)" aria-label="Input 6">6</button>
+          <button class="num-btn" data-num="7" onclick="inputNumber(7)" aria-label="Input 7">7</button>
+          <button class="num-btn" data-num="8" onclick="inputNumber(8)" aria-label="Input 8">8</button>
+          <button class="num-btn" data-num="9" onclick="inputNumber(9)" aria-label="Input 9">9</button>
+        </div>
+      </section>
+
+      <!-- ─── Controls sidebar ─────────────────────────────────────────────── -->
+      <aside class="controls-sidebar">
+        <div class="control-card">
+          <h2 class="control-title">Controls</h2>
+
+          <button class="ctrl-btn" id="hintBtn" onclick="getHint()" aria-label="Get hint">
+            <span class="ctrl-icon">💡</span>
+            <span class="ctrl-label">Hint</span>
+            <span class="ctrl-badge" id="hintCount">3 left</span>
+          </button>
+
+          <button class="ctrl-btn" id="undoBtn" onclick="undoMove()" aria-label="Undo last move">
+            <span class="ctrl-icon">↩</span>
+            <span class="ctrl-label">Undo</span>
+          </button>
+
+          <button class="ctrl-btn" id="eraseBtn" onclick="eraseCell()" aria-label="Erase selected cell">
+            <span class="ctrl-icon">⌫</span>
+            <span class="ctrl-label">Erase</span>
+          </button>
+
+          <button class="ctrl-btn" id="resetBtn" onclick="resetGame()" aria-label="Reset puzzle">
+            <span class="ctrl-icon">🔄</span>
+            <span class="ctrl-label">Restart</span>
+          </button>
+        </div>
+
+        <!-- ─── OOP info card ──────────────────────────────────────────────── -->
+        <div class="control-card oop-card">
+          <h2 class="control-title">Java OOP</h2>
+          <ul class="oop-list">
+            <li class="oop-item">
+              <span class="oop-badge encap">E</span>
+              <div>
+                <strong>Encapsulation</strong>
+                <p>SudokuCell · private fields + fixed-cell guard</p>
+              </div>
+            </li>
+            <li class="oop-item">
+              <span class="oop-badge abstr">A</span>
+              <div>
+                <strong>Abstraction</strong>
+                <p>GameOperations interface → SudokuGameService</p>
+              </div>
+            </li>
+            <li class="oop-item">
+              <span class="oop-badge inh">I</span>
+              <div>
+                <strong>Inheritance</strong>
+                <p>SudokuGame extends abstract Game</p>
+              </div>
+            </li>
+            <li class="oop-item">
+              <span class="oop-badge poly">P</span>
+              <div>
+                <strong>Polymorphism</strong>
+                <p>Game ref → SudokuGame#startGame() at runtime</p>
+              </div>
+            </li>
+            <li class="oop-item">
+              <span class="oop-badge comp">C</span>
+              <div>
+                <strong>Composition</strong>
+                <p>SudokuGame HAS-A SudokuBoard HAS-A SudokuCell[][]</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <!-- ─── Status bar ───────────────────────────────────────────────────────── -->
+    <div class="status-bar" id="statusBar" role="status" aria-live="polite">
+      <span id="statusMsg">Select a cell and enter a number to begin.</span>
+    </div>
+
+  </div><!-- /.app-wrapper -->
+
+  <!-- ─── Victory overlay ──────────────────────────────────────────────────── -->
+  <div class="overlay" id="victoryOverlay" role="dialog" aria-modal="true" aria-labelledby="victoryTitle" hidden>
+    <div class="overlay-card victory-card">
+      <div class="victory-confetti" aria-hidden="true">🎉</div>
+      <h2 id="victoryTitle" class="overlay-title">Puzzle Solved!</h2>
+      <p class="overlay-sub">Congratulations — you cracked it!</p>
+      <div class="victory-stats">
+        <div class="v-stat">
+          <span class="v-stat-val" id="vTime">—</span>
+          <span class="v-stat-lbl">Time</span>
+        </div>
+        <div class="v-stat">
+          <span class="v-stat-val" id="vMistakes">—</span>
+          <span class="v-stat-lbl">Mistakes</span>
+        </div>
+        <div class="v-stat">
+          <span class="v-stat-val" id="vHints">—</span>
+          <span class="v-stat-lbl">Hints</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-lg" onclick="startNewGame(); closeOverlay()">Play Again</button>
+    </div>
+  </div>
+
+  <!-- ─── Loading overlay ──────────────────────────────────────────────────── -->
+  <div class="overlay" id="loadingOverlay" role="status" aria-live="polite">
+    <div class="spinner-wrap">
+      <div class="spinner" aria-hidden="true"></div>
+      <p class="spinner-text">Generating puzzle…</p>
+    </div>
+  </div>
+
+  <!-- ─── Error toast ───────────────────────────────────────────────────────── -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive" hidden></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

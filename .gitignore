@@ -1,0 +1,26 @@
+# Maven build output
+backend/target/
+target/
+*.class
+
+# JAR files and packages
+*.jar
+*.war
+*.zip
+
+# Logs
+*.log
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+
+# OS files
+Thumbs.db
+.DS_Store
